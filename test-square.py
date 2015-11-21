@@ -6,6 +6,7 @@ import numpy as np
 sys.path.append(os.getcwd() + "/lib")
 import compositor
 import heapq
+import pdb
 
 def angle_cos(p0, p1, p2):
     d1, d2 = (p0-p1).astype('float'), (p2-p1).astype('float')
@@ -41,9 +42,19 @@ gray = cv2.medianBlur(gray, 5)
 
 # edges = cv2.Canny(gray, )
 edges = find_squares(img)
-mycontours = heapq.nlargest(2, edges, key=cv2.contourArea)
-cv2.drawContours(img, [mycontours[1]], -1, (0, 255, 0), 3)
+edges = heapq.nlargest(2, edges, key=cv2.contourArea)
+edges = [edges[1]]
+print edges
+cv2.drawContours(img, edges, -1, (0, 255, 0), 3)
 
-cv2.imshow("result", img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+actualboard = np.float32([[400,0], [0, 0], [0, 300], [400, 300]])
+sensedboard = np.float32(edges)
+persp_M = cv2.getPerspectiveTransform(sensedboard, actualboard)
+print persp_M
+
+persp_img = cv2.warpPerspective(img, persp_M, (300,300))
+
+cv2.imshow('original', img)
+k = cv2.waitKey(0) & 0xFF
+cv2.imshow('result', persp_img)
+k = cv2.waitKey(0) & 0xFF
