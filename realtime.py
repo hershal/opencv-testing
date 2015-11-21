@@ -11,16 +11,12 @@ def nothing(x):
 cv2.namedWindow('result')
 
 # Starting with 100's to prevent error while masking
-h,s,v = 100,100,100
-hw,sw,vw = 180,255,255
-
-# Creating track bar
 cv2.createTrackbar('h', 'result',0,179,nothing)
-cv2.createTrackbar('hw', 'result',0,179,nothing)
+cv2.createTrackbar('hw', 'result',179,179,nothing)
 cv2.createTrackbar('s', 'result',0,255,nothing)
-cv2.createTrackbar('sw', 'result',0,255,nothing)
+cv2.createTrackbar('sw', 'result',255,255,nothing)
 cv2.createTrackbar('v', 'result',0,255,nothing)
-cv2.createTrackbar('vw', 'result',0,255,nothing)
+cv2.createTrackbar('vw', 'result',255,255,nothing)
 
 while(1):
 
