@@ -30,7 +30,7 @@ def find_squares(img):
 
 cap = cv2.VideoCapture(0)
 
-while (1) {
+while(1):
     img = cv2.imread(sys.argv[1])
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -56,7 +56,6 @@ while (1) {
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
-}
 
 cap.release()
 
