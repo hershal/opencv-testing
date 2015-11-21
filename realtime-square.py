@@ -30,28 +30,33 @@ def find_squares(img):
 
 cap = cv2.VideoCapture(0)
 
+_, firstcap = cap.read()
+imgheight, imgwidth = firstcap.shape[:2]
+imgarea = imgheight*imgwidth
+
 while(1):
     _, img = cap.read()
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.medianBlur(gray, 5)
 
     # edges = cv2.Canny(gray, )
     edges = find_squares(img)
-    edges = heapq.nlargest(2, edges, key=cv2.contourArea)
-    edges = [edges[1]]
-    print edges
-    cv2.drawContours(img, edges, -1, (0, 255, 0), 3)
+    # edges = heapq.nlargest(3, edges, key=cv2.contourArea)
 
-    actualboard = np.float32([[400,0], [0, 0], [0, 300], [400, 300]])
-    sensedboard = np.float32(edges)
-    persp_M = cv2.getPerspectiveTransform(sensedboard, actualboard)
-    print persp_M
+    edges = (x for x in edges if lambda x: cv2.contourArea(x) < .90*imgarea)
 
-    persp_img = cv2.warpPerspective(img, persp_M, (300,300))
+    for edge in edges:
+        cv2.drawContours(img, [edge], -1, (0, 0, 255), 3)
+
+        actualboard = np.float32([[400,0], [0, 0], [0, 300], [400, 300]])
+        sensedboard = np.float32(edge)
+        persp_M = cv2.getPerspectiveTransform(sensedboard, actualboard)
+        # print persp_M
+
+        persp_img = cv2.warpPerspective(img, persp_M, (400,300))
+        cv2.imshow('result', persp_img)
 
     cv2.imshow('original', img)
-    cv2.imshow('result', persp_img)
 
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
