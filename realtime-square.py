@@ -31,7 +31,7 @@ def find_squares(img):
 cap = cv2.VideoCapture(0)
 
 while(1):
-    img = cv2.imread(sys.argv[1])
+    img = cap.read()
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
