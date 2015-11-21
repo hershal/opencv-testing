@@ -40,17 +40,22 @@ while(1):
 
     edges = (x for x in edges if lambda x: cv2.contourArea(x) < .95*imgarea)
     edges = sorted(edges, key=cv2.contourArea, reverse=True)[:1]
-    print map(cv2.contourArea, edges)
 
     for edge in edges:
-        actualboard = np.float32([[800,0], [0, 0], [0, 600], [800, 600]])
-        sensedboard = np.float32(edge)
-        persp_M = cv2.getPerspectiveTransform(sensedboard, actualboard)
-        # print persp_M
+        pts = edge.reshape(4,2)
+        rect = np.zeros((4,2), dtype="float32")
+        s = pts.sum(axis=1)
+        rect[0] = pts[np.argmin(s)]
+        rect[2] = pts[np.argmax(s)]
+        d = np.diff(pts, axis=1)
+        rect[1] = pts[np.argmin(d)]
+        rect[3] = pts[np.argmax(d)]
 
+        actualboard = np.float32([[0,0], [0, 600], [800, 600], [800, 0]])
+        persp_M = cv2.getPerspectiveTransform(rect, actualboard)
         persp_img = cv2.warpPerspective(img, persp_M, (800,600))
-        cv2.imshow('result', persp_img.copy())
 
+        cv2.imshow('result', persp_img.copy())
         cv2.drawContours(img, [edge], -1, (0, 0, 255), 3)
 
     cv2.imshow('original', img)
