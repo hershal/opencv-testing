@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 sys.path.append(os.getcwd() + "/lib")
 import compositor
+import heapq
 
 def nothing(x):
     pass
@@ -40,9 +41,17 @@ while(1):
     mask = cv2.inRange(hsv,lower_filter, upper_filter)
 
     comp = compositor.compositor()
-    comp.push(frame, invert=True)
+    comp.push(frame)
     comp.mask(mask)
 
+    (contours, cnts, _) = cv2.findContours(mask.copy(),
+                                           cv2.RETR_EXTERNAL,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+    areas = heapq.nlargest(4, cnts, key=cv2.contourArea)
+    for c in areas:
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.05 * peri, True)
+        cv2.drawContours(comp.composited_img, [approx], -1, (0, 255, 0), 4)
     cv2.imshow('result', comp.composited_img)
 
     k = cv2.waitKey(5) & 0xFF
